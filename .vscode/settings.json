@@ -5,6 +5,9 @@
         "stdbool.h": "c",
         "stddef.h": "c",
         "chunk.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "scanner.h": "c"
     }
 }
