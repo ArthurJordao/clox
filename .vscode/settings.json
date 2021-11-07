@@ -8,6 +8,8 @@
         "stdio.h": "c",
         "limits": "c",
         "type_traits": "c",
-        "scanner.h": "c"
+        "scanner.h": "c",
+        "typeinfo": "c",
+        "compiler.h": "c"
     }
 }
