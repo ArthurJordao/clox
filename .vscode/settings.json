@@ -10,6 +10,15 @@
         "type_traits": "c",
         "scanner.h": "c",
         "typeinfo": "c",
-        "compiler.h": "c"
+        "compiler.h": "c",
+        "optional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "string": "c"
     }
 }
