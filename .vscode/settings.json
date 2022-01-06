@@ -19,6 +19,18 @@
         "functional": "cpp",
         "tuple": "cpp",
         "utility": "cpp",
-        "string": "c"
+        "string": "c",
+        "__functional_base": "c",
+        "__functional_base_03": "c",
+        "__hash_table": "c",
+        "__tuple": "c",
+        "algorithm": "c",
+        "chrono": "c",
+        "compare": "c",
+        "iterator": "c",
+        "memory": "c",
+        "random": "c",
+        "ratio": "c",
+        "ranges": "c"
     }
 }
