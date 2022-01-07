@@ -33,9 +33,11 @@ void initVM() {
 
     initTable(&vm.globals);
     vm.objects = NULL;
+    initTable(&vm.strings);
 }
 
 void freeVM() {
+  freeTable(&vm.strings);
   freeObjects();
 }
 
