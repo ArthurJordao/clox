@@ -19,6 +19,7 @@
         "functional": "cpp",
         "tuple": "cpp",
         "utility": "cpp",
-        "string": "c"
+        "string": "c",
+        "debug.h": "c"
     }
 }
