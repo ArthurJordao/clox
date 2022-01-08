@@ -3,12 +3,15 @@
 
 #include "common.h"
 #include "value.h"
+
 typedef enum {
   OP_CONSTANT,
   OP_NIL,
   OP_TRUE,
   OP_FALSE,
   OP_POP,
+  OP_GET_LOCAL,
+  OP_SET_LOCAL,
   OP_GET_GLOBAL,
   OP_DEFINE_GLOBAL,
   OP_SET_GLOBAL,
