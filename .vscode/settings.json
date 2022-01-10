@@ -20,6 +20,7 @@
         "tuple": "cpp",
         "utility": "cpp",
         "string": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "*.tcc": "c"
     }
 }
