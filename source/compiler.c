@@ -141,6 +141,11 @@ static void emitByte(uint8_t byte) {
   writeChunk(currentChunk(), byte, parser.previous.line);
 }
 
+static void emitBytes(uint8_t byte1, uint8_t byte2) {
+  emitByte(byte1);
+  emitByte(byte2);
+}
+
 static void emitReturn() {
   if (current->type == TYPE_INITIALIZER) {
     emitBytes(OP_GET_LOCAL, 0);
@@ -158,11 +163,6 @@ static uint8_t makeConstant(Value value) {
   }
 
   return (uint8_t)constant;
-}
-
-static void emitBytes(uint8_t byte1, uint8_t byte2) {
-  emitByte(byte1);
-  emitByte(byte2);
 }
 
 static void emitLoop(int loopStart) {
@@ -463,6 +463,7 @@ static void expression() {
 
 static void statement();
 static void declaration();
+static void classDeclaration();
 
 static void block() {
   while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
@@ -515,52 +516,11 @@ static void method() {
   emitBytes(OP_METHOD, constant);
 }
 
-static void classDeclaration() {
-  consume(TOKEN_IDENTIFIER, "Expect class name.");
-  Token className = parser.previous;
-  uint8_t nameConstant = identifierConstant(&parser.previous);
-  declareVariable();
-
-  emitBytes(OP_CLASS, nameConstant);
-  defineVariable(nameConstant);
-
-  ClassCompiler classCompiler;
-  classCompiler.hasSuperclass = false;
-  classCompiler.enclosing = currentClass;
-  currentClass = &classCompiler;
-
-  if (match(TOKEN_LESS)) {
-    consume(TOKEN_IDENTIFIER, "Expect superclass name.");
-    variable(false);
-
-    if (identifiersEqual(&className, &parser.previous)) {
-      error("A class can't inherit from itself.");
-    }
-
-    beginScope();
-    addLocal(syntheticToken("super"));
-    defineVariable(0);
-
-    namedVariable(className, false);
-    emitByte(OP_INHERIT);
-    classCompiler.hasSuperclass = true;
-  }
-
-  namedVariable(className, false);
-  consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
-
-  while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
-    method();
-  }
-
-  consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
-  emitByte(OP_POP);
-
-  if (classCompiler.hasSuperclass) {
-    endScope();
-  }
-
-  currentClass = currentClass->enclosing;
+static Token syntheticToken(const char* text) {
+  Token token;
+  token.start = text;
+  token.length = (int)strlen(text);
+  return token;
 }
 
 static void funDeclaration() {
@@ -798,13 +758,6 @@ static void variable(bool canAssign) {
   namedVariable(parser.previous, canAssign);
 }
 
-static Token syntheticToken(const char* text) {
-  Token token;
-  token.start = text;
-  token.length = (int)strlen(text);
-  return token;
-}
-
 static void super_(bool canAssign) {
   if (currentClass == NULL) {
     error("Can't use 'super' outside of a class.");
@@ -826,6 +779,54 @@ static void super_(bool canAssign) {
     namedVariable(syntheticToken("super"), false);
     emitBytes(OP_GET_SUPER, name);
   }
+}
+
+static void classDeclaration() {
+  consume(TOKEN_IDENTIFIER, "Expect class name.");
+  Token className = parser.previous;
+  uint8_t nameConstant = identifierConstant(&parser.previous);
+  declareVariable();
+
+  emitBytes(OP_CLASS, nameConstant);
+  defineVariable(nameConstant);
+
+  ClassCompiler classCompiler;
+  classCompiler.hasSuperclass = false;
+  classCompiler.enclosing = currentClass;
+  currentClass = &classCompiler;
+
+  if (match(TOKEN_LESS)) {
+    consume(TOKEN_IDENTIFIER, "Expect superclass name.");
+    variable(false);
+
+    if (identifiersEqual(&className, &parser.previous)) {
+      error("A class can't inherit from itself.");
+    }
+
+    beginScope();
+    addLocal(syntheticToken("super"));
+    defineVariable(0);
+
+    namedVariable(className, false);
+    emitByte(OP_INHERIT);
+    classCompiler.hasSuperclass = true;
+  }
+
+  namedVariable(className, false);
+  consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
+
+  while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
+    method();
+  }
+
+  consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
+  emitByte(OP_POP);
+
+  if (classCompiler.hasSuperclass) {
+    endScope();
+  }
+
+  currentClass = currentClass->enclosing;
 }
 
 static void this_(bool canAssign) {
